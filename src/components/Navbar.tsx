@@ -1,28 +1,36 @@
-
 import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Menu, X } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Menu, X, Github } from "lucide-react";
+import { personalInfo } from "@/data";
 
 const navLinks = [
-  { name: "Home", url: "#home" },
-  { name: "About", url: "#about" },
-  { name: "Skills", url: "#skills" },
-  { name: "Projects", url: "#projects" },
-  { name: "Experience", url: "#experience" },
-  { name: "Contact", url: "#contact" },
+  { name: "About", href: "#about" },
+  { name: "Skills", href: "#skills" },
+  { name: "Projects", href: "#projects" },
+  { name: "Experience", href: "#experience" },
+  { name: "Achievements", href: "#achievements" },
+  { name: "Contact", href: "#contact" },
 ];
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState("");
 
-  // Handle scroll effect for navbar
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 50) {
-        setIsScrolled(true);
-      } else {
-        setIsScrolled(false);
+      setIsScrolled(window.scrollY > 50);
+
+      const sections = navLinks.map((link) => link.href.slice(1));
+      for (const section of sections.reverse()) {
+        const element = document.getElementById(section);
+        if (element) {
+          const rect = element.getBoundingClientRect();
+          if (rect.top <= 150) {
+            setActiveSection(section);
+            break;
+          }
+        }
       }
     };
 
@@ -30,71 +38,136 @@ const Navbar = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    e.preventDefault();
+    const element = document.querySelector(href);
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth" });
+    }
+    setMobileMenuOpen(false);
+  };
+
   return (
-    <header
+    <motion.header
+      initial={{ y: -100 }}
+      animate={{ y: 0 }}
+      transition={{ duration: 0.5, ease: "easeOut" }}
       className={`fixed top-0 w-full z-50 transition-all duration-300 ${
         isScrolled
-          ? "bg-navy/90 backdrop-blur-md py-3 shadow-lg"
-          : "bg-transparent py-5"
+          ? "bg-dark-950/80 backdrop-blur-xl border-b border-white/5"
+          : "bg-transparent"
       }`}
     >
-      <div className="container max-w-6xl mx-auto px-6 flex justify-between items-center">
-        <a href="#home" className="text-highlight font-bold text-2xl">
-          SD
-        </a>
-
-        {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center gap-8">
-          {navLinks.map((link, index) => (
-            <a
-              key={link.name}
-              href={link.url}
-              className="nav-link"
-              style={{ animationDelay: `${index * 100}ms` }}
-            >
-              <span className="text-highlight mr-1">0{index + 1}.</span>
-              {link.name}
-            </a>
-          ))}
-          <Button className="ml-4 bg-transparent text-highlight border border-highlight hover:bg-highlight/10">
-            Resume
-          </Button>
-        </nav>
-
-        {/* Mobile menu button */}
-        <Button
-          variant="ghost"
-          size="icon"
-          className="md:hidden text-highlight"
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+      <nav className="container max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+        <motion.a
+          href="#"
+          onClick={(e) => {
+            e.preventDefault();
+            window.scrollTo({ top: 0, behavior: "smooth" });
+          }}
+          className="relative z-10"
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
         >
-          {mobileMenuOpen ? <X /> : <Menu />}
-        </Button>
-      </div>
+          <span className="text-2xl font-bold gradient-text">SD</span>
+        </motion.a>
 
-      {/* Mobile Navigation */}
-      {mobileMenuOpen && (
-        <div className="md:hidden bg-navy-light fixed top-[62px] right-0 w-full h-[calc(100vh-62px)] flex flex-col items-center justify-center">
-          <nav className="flex flex-col items-center gap-8">
-            {navLinks.map((link, index) => (
-              <a
-                key={link.name}
-                href={link.url}
-                className="nav-link text-xl"
-                onClick={() => setMobileMenuOpen(false)}
-                style={{ animationDelay: `${index * 100}ms` }}
-              >
-                <span className="text-highlight mr-1">0{index + 1}.</span>
-                {link.name}
-              </a>
-            ))}
-            <Button className="mt-4 bg-transparent text-highlight border border-highlight hover:bg-highlight/10">
-              Resume
-            </Button>
-          </nav>
+        <div className="hidden md:flex items-center gap-1">
+          {navLinks.map((link, index) => (
+            <motion.a
+              key={link.name}
+              href={link.href}
+              onClick={(e) => handleNavClick(e, link.href)}
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.1 }}
+              className={`relative px-4 py-2 text-sm font-medium transition-colors ${
+                activeSection === link.href.slice(1)
+                  ? "text-cyber-cyan"
+                  : "text-gray-400 hover:text-white"
+              }`}
+            >
+              {link.name}
+              {activeSection === link.href.slice(1) && (
+                <motion.div
+                  layoutId="activeSection"
+                  className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-cyber-cyan to-cyber-blue"
+                  transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                />
+              )}
+            </motion.a>
+          ))}
+          
+          <motion.a
+            href={personalInfo.github}
+            target="_blank"
+            rel="noopener noreferrer"
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="ml-4 flex items-center gap-2 px-4 py-2 text-sm font-medium text-cyber-cyan border border-cyber-cyan/30 rounded-lg hover:bg-cyber-cyan/10 transition-colors"
+          >
+            <Github size={16} />
+            GitHub
+          </motion.a>
         </div>
-      )}
-    </header>
+
+        <motion.button
+          whileTap={{ scale: 0.9 }}
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          className="md:hidden relative z-10 p-2 text-gray-400 hover:text-white transition-colors"
+          aria-label="Toggle menu"
+        >
+          {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+        </motion.button>
+      </nav>
+
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.3 }}
+            className="md:hidden bg-dark-900/95 backdrop-blur-xl border-b border-white/5"
+          >
+            <div className="container max-w-6xl mx-auto px-6 py-6 flex flex-col gap-4">
+              {navLinks.map((link, index) => (
+                <motion.a
+                  key={link.name}
+                  href={link.href}
+                  onClick={(e) => handleNavClick(e, link.href)}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: index * 0.05 }}
+                  className={`text-lg font-medium transition-colors ${
+                    activeSection === link.href.slice(1)
+                      ? "text-cyber-cyan"
+                      : "text-gray-400 hover:text-white"
+                  }`}
+                >
+                  {link.name}
+                </motion.a>
+              ))}
+              <motion.a
+                href={personalInfo.github}
+                target="_blank"
+                rel="noopener noreferrer"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.3 }}
+                className="flex items-center gap-2 text-lg font-medium text-cyber-cyan"
+              >
+                <Github size={18} />
+                GitHub
+              </motion.a>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.header>
   );
 };
 

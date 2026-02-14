@@ -1,263 +1,419 @@
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ExternalLink, Github, X, ChevronRight, Shield, Zap, Users, Server, Layers, Code2 } from "lucide-react";
+import { FadeInUp, StaggerContainer, StaggerItem } from "./motion";
+import { projects, legacyProjects, type Project } from "@/data";
 
-import { useState, useEffect } from "react";
-import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { ExternalLink, Github } from "lucide-react";
+const categoryColors: Record<string, string> = {
+  DeFi: "bg-cyber-cyan/10 text-cyber-cyan border-cyber-cyan/20",
+  Web3: "bg-cyber-blue/10 text-cyber-blue border-cyber-blue/20",
+  Infrastructure: "bg-neon-green/10 text-neon-green border-neon-green/20",
+  Hackathon: "bg-cyber-purple/10 text-cyber-purple border-cyber-purple/20",
+};
 
-type Project = {
-  id: number;
-  title: string;
-  description: string;
-  longDescription: string;
-  image: string;
-  techStack: string[];
-  category: string;
-  liveUrl?: string;
-  githubUrl?: string;
-  features: string[];
+const priorityBadges: Record<string, { label: string; color: string }> = {
+  highest: { label: "Flagship", color: "bg-yellow-500/20 text-yellow-400 border-yellow-500/30" },
+  high: { label: "Featured", color: "bg-cyber-cyan/20 text-cyber-cyan border-cyber-cyan/30" },
+  medium: { label: "", color: "" },
 };
 
 const ProjectsSection = () => {
-  const [isVisible, setIsVisible] = useState(false);
-  const [filter, setFilter] = useState<string>("All");
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const [activeTab, setActiveTab] = useState<"overview" | "architecture" | "tech">("overview");
 
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting) {
-          setIsVisible(true);
-          observer.unobserve(entries[0].target);
-        }
-      },
-      { threshold: 0.1 }
-    );
-
-    const element = document.getElementById("projects");
-    if (element) observer.observe(element);
-
-    return () => {
-      if (element) observer.unobserve(element);
-    };
-  }, []);
-  
-  const projects: Project[] = [
-    {
-      id: 1,
-      title: "HealthAI",
-      description: "A comprehensive healthcare platform with AI-powered disease prediction.",
-      longDescription: "Architected and deployed a comprehensive healthcare platform in 48 hours during a hackathon, implementing 7+ core features including telemedicine, appointment management, and AI-powered disease prediction. The platform integrates a custom BERT-based disease prediction model with 92% accuracy across 100+ common diseases and processes symptom inputs in under 3 seconds. It also features a secure telemedicine infrastructure supporting 1080p video quality with 99.9% uptime, and a prescription management system capable of handling 1000+ medical records daily.",
-      image: "https://img.freepik.com/free-vector/hospital-logo-design-vector-medical-cross_53876-136743.jpg?semt=ais_hybrid&w=740&q=80",
-      techStack: ["React", "Tailwind", "Firebase", "Python"],
-      category: "AI/ML",
-      liveUrl: undefined,
-      githubUrl: "https://github.com/shivam",
-      features: [
-        "Architected and deployed a full-featured healthcare platform in 48 hours during a hackathon.",
-        "Implemented 7+ core features, including telemedicine and appointment management.",
-        "Developed a custom BERT-based disease prediction model with 92% accuracy across 100+ common diseases.",
-        "Processed symptom inputs in under 3 seconds for rapid diagnosis assistance.",
-        "Implemented a secure telemedicine infrastructure with 1080p video quality and 99.9% uptime.",
-        "Integrated a prescription management system capable of handling 1000+ medical records daily.",
-      ],
-    },
-    {
-      id: 2,
-      title: "BLOCKROLL",
-      description: "A secure, transparent blockchain-based payroll system.",
-      longDescription: "Developed a blockchain-based payroll system that leverages blockchain technology to automate salary distribution, ensuring payments are secure, transparent, and executed automatically without manual intervention. The system integrates Web3.js and Truffle to enable transparent, tamper-proof payroll transactions by connecting the frontend with Ethereum smart contracts (Solidity). The frontend is built with React.js and Material-UI for a seamless user experience.",
-      image: "https://pbs.twimg.com/profile_images/1876611855931580416/ixedAURS_400x400.jpg",
-      techStack: ["React.js", "Material-UI", "Bootstrap", "Web3.js", "Truffle", "Ethereum", "Solidity"],
-      category: "Blockchain",
-      liveUrl: undefined,
-      githubUrl: "https://github.com/shivam",
-      features: [
-        "Developed a blockchain-based payroll system to automate salary distribution.",
-        "Ensured payments are secure, transparent, and automatically executed without manual intervention.",
-        "Integrated Web3.js and Truffle to enable transparent, tamper-proof payroll transactions.",
-        "Used Ethereum smart contracts (Solidity) for backend logic.",
-        "Built a modern React.js frontend with Material-UI for a seamless user experience.",
-        "Transfers tokens, mints new tokens, and allows users to buy tokens.",
-      ],
-    },
-    {
-      id: 3,
-      title: "YouTube Clone",
-      description: "A basic YouTube UI clone built with pure HTML and CSS.",
-      longDescription: "A front-end-only project that recreates the user interface of YouTube. It focuses on pixel-perfect design and responsive layouts using only HTML and CSS. The project demonstrates strong proficiency in fundamental web development skills, including semantic HTML and modern CSS techniques for layout and styling.",
-      image: "https://i.pinimg.com/736x/10/0d/92/100d925f120c7b3c1a53b2aaea2ec11c.jpg",
-      techStack: ["HTML", "CSS"],
-      category: "Web Application",
-      liveUrl: undefined,
-      githubUrl: undefined,
-      features: [
-        "Replicated the YouTube user interface layout and design.",
-        "Implemented a responsive design to work on various screen sizes.",
-        "Utilized advanced CSS techniques like Flexbox and Grid for layout.",
-        "Demonstrated a strong understanding of core front-end technologies.",
-      ],
-    },
-    {
-      id: 4,
-      title: "React Crypto Wallet",
-      description: "A basic crypto wallet connecting to Ethereum and Solana.",
-      longDescription: "A foundational crypto wallet application built with React, connecting to both Ethereum and Solana networks. It allows users to manage and view their balances on both chains. This project highlights the ability to integrate with different blockchain networks using modern libraries and demonstrates an understanding of multi-chain web3 development principles.",
-      image: "https://static.news.bitcoin.com/wp-content/uploads/2023/12/solanaeth.jpg",
-      techStack: ["React.js", "Solana", "Ethereum"],
-      category: "Blockchain",
-      liveUrl: undefined,
-      githubUrl: undefined,
-      features: [
-        "Connects to both Ethereum and Solana blockchains.",
-        "Allows users to view wallet balances on both networks.",
-        "Demonstrates basic wallet functionalities and multi-chain integration.",
-        "Uses libraries like Web3.js and Ethers.js for blockchain interaction.",
-      ],
-    },
-  ];
-  const categories = ["All", ...new Set(projects.map((project) => project.category))];
-  const filteredProjects = filter === "All" ? projects : projects.filter((project) => project.category === filter);
+  // Filter to only show featured projects (the 3 main ones)
+  const featuredProjects = projects.filter(p => p.featured);
 
   return (
     <section id="projects" className="section-container">
-      <h2 className={`section-title ${isVisible ? "animate-fade-in-up" : "opacity-0"}`}>
-        <span className="section-title-number">03.</span> My Projects
-      </h2>
+      <FadeInUp>
+        <p className="text-cyber-cyan font-mono text-sm mb-2">03. What I've Built</p>
+        <h2 className="section-title">Featured Projects</h2>
+        <p className="section-subtitle">
+          Production-grade blockchain systems with real impact. 
+          Click on any project to explore the technical architecture.
+        </p>
+      </FadeInUp>
 
-      {/* Category Filters */}
-      <div className={`mb-10 flex flex-wrap gap-2 ${isVisible ? "animate-fade-in-up" : "opacity-0"}`} style={{ animationDelay: "200ms" }}>
-        {categories.map((category) => (
-          <Badge
-            key={category}
-            className={`cursor-pointer text-sm py-2 px-4 ${
-              filter === category
-                ? "bg-highlight text-navy"
-                : "bg-navy-light hover:bg-navy-light/80"
-            }`}
-            onClick={() => setFilter(category)}
-          >
-            {category}
-          </Badge>
-        ))}
-      </div>
+      {/* Featured Projects Grid */}
+      <StaggerContainer className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-12">
+        {featuredProjects.map((project) => (
+          <StaggerItem key={project.id}>
+            <motion.div
+              layoutId={`project-${project.id}`}
+              onClick={() => setSelectedProject(project)}
+              whileHover={{ y: -4, scale: 1.01 }}
+              className="glass-card p-6 cursor-pointer glow-border group h-full flex flex-col relative"
+            >
+              {/* Priority Badge */}
+              {project.priority !== "medium" && (
+                <div className={`absolute -top-2 -right-2 px-2 py-1 rounded-full text-xs font-medium border ${priorityBadges[project.priority].color}`}>
+                  {project.priority === "highest" ? "🚀" : "⭐"} {priorityBadges[project.priority].label}
+                </div>
+              )}
 
-      {/* Projects Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {filteredProjects.map((project, index) => (
-          <Card
-            key={project.id}
-            className={`bg-navy-light border border-highlight/20 overflow-hidden ${
-              isVisible ? "animate-fade-in-up" : "opacity-0"
-            } card-hover`}
-            style={{ animationDelay: `${300 + index * 100}ms` }}
-          >
-            <div className="h-48 overflow-hidden">
-              <img
-                src={project.image}
-                alt={project.title}
-                className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
-              />
-            </div>
-            <CardHeader className="pb-2">
-              <h3 className="text-xl font-semibold text-slate-light">{project.title}</h3>
-            </CardHeader>
-            <CardContent className="pb-2">
-              <p className="text-slate mb-4">{project.description}</p>
-              <div className="flex flex-wrap gap-2 mt-2">
-                {project.techStack.slice(0, 3).map((tech) => (
-                  <Badge key={tech} className="bg-highlight/10 text-highlight">
-                    {tech}
-                  </Badge>
+              {/* Header */}
+              <div className="flex items-start justify-between mb-4">
+                <div className="flex-1">
+                  <div className="flex flex-wrap gap-2 mb-2">
+                    <span className={`inline-block px-2 py-1 rounded text-xs font-medium border ${categoryColors[project.category]}`}>
+                      {project.category}
+                    </span>
+                    {project.achievement && (
+                      <span className="inline-block px-2 py-1 rounded text-xs font-medium bg-yellow-500/10 text-yellow-400 border border-yellow-500/20">
+                        🏆 {project.achievement.result}
+                      </span>
+                    )}
+                  </div>
+                  <h3 className="text-xl font-bold text-white group-hover:text-cyber-cyan transition-colors">
+                    {project.title}
+                  </h3>
+                  <p className="text-gray-400 text-sm mt-1">{project.tagline}</p>
+                </div>
+                <ChevronRight className="text-gray-600 group-hover:text-cyber-cyan group-hover:translate-x-1 transition-all flex-shrink-0" />
+              </div>
+
+              {/* Description */}
+              <p className="text-gray-400 text-sm leading-relaxed mb-4 flex-grow">
+                {project.quickSummary}
+              </p>
+
+              {/* Impact Metrics Preview */}
+              <div className="grid grid-cols-2 gap-2 mb-4">
+                {project.impactMetrics.slice(0, 2).map((metric) => (
+                  <div key={metric.label} className="bg-dark-800/50 rounded-lg p-2 text-center">
+                    <p className="text-cyber-cyan font-bold text-sm">{metric.value}</p>
+                    <p className="text-gray-500 text-xs">{metric.label}</p>
+                  </div>
                 ))}
-                {project.techStack.length > 3 && (
-                  <Badge className="bg-highlight/10 text-highlight">
-                    +{project.techStack.length - 3}
-                  </Badge>
-                )}
               </div>
-            </CardContent>
-            <CardFooter className="pt-0">
-              <Button
-                variant="ghost"
-                className="text-highlight hover:bg-highlight/10 hover:text-highlight"
-                onClick={() => setSelectedProject(project)}
-              >
-                View Details
-              </Button>
-            </CardFooter>
-          </Card>
+
+              {/* Tech Stack Preview */}
+              <div className="flex flex-wrap gap-2 mt-auto">
+                {project.techStack.slice(0, 2).flatMap(cat => cat.technologies.slice(0, 2)).slice(0, 4).map((tech) => (
+                  <span
+                    key={tech}
+                    className="px-2 py-1 bg-dark-700/50 text-gray-300 text-xs rounded"
+                  >
+                    {tech}
+                  </span>
+                ))}
+                <span className="px-2 py-1 bg-dark-700/50 text-gray-500 text-xs rounded">
+                  +more
+                </span>
+              </div>
+            </motion.div>
+          </StaggerItem>
         ))}
-      </div>
+      </StaggerContainer>
 
-      {/* Project Detail Dialog */}
-      <Dialog open={selectedProject !== null} onOpenChange={(open) => !open && setSelectedProject(null)}>
-        {selectedProject && (
-          <DialogContent className="max-w-3xl bg-navy border border-highlight/20">
-            <DialogHeader>
-              <DialogTitle className="text-2xl font-bold text-slate-light">
-                {selectedProject.title}
-              </DialogTitle>
-              <DialogDescription className="text-slate">
-                {selectedProject.longDescription}
-              </DialogDescription>
-            </DialogHeader>
-
-            <div className="h-64 overflow-hidden rounded-md my-4">
-              <img
-                src={selectedProject.image}
-                alt={selectedProject.title}
-                className="w-full h-full object-cover"
-              />
-            </div>
-
-            <div className="space-y-4">
-              <div>
-                <h4 className="font-semibold text-slate-light mb-2">Key Features:</h4>
-                <ul className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                  {selectedProject.features.map((feature, index) => (
-                    <li key={index} className="flex items-start">
-                      <span className="text-highlight mr-2">▹</span>
-                      <span className="text-slate">{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              <div>
-                <h4 className="font-semibold text-slate-light mb-2">Tech Stack:</h4>
-                <div className="flex flex-wrap gap-2">
-                  {selectedProject.techStack.map((tech) => (
-                    <Badge key={tech} className="bg-highlight/10 text-highlight">
+      {/* Other Projects Section */}
+      <FadeInUp delay={0.2}>
+        <div className="border-t border-white/5 pt-8">
+          <h3 className="text-lg font-semibold text-white mb-4">Other Projects</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {legacyProjects.map((project) => (
+              <div key={project.id} className="glass-card p-4 glow-border">
+                <div className="flex items-start justify-between mb-2">
+                  <h4 className="font-medium text-white">{project.title}</h4>
+                  {project.github && (
+                    <a
+                      href={project.github}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-gray-400 hover:text-cyber-cyan transition-colors"
+                    >
+                      <Github size={16} />
+                    </a>
+                  )}
+                </div>
+                <p className="text-gray-400 text-sm mb-3">{project.description}</p>
+                <div className="flex flex-wrap gap-1">
+                  {project.techStack.map((tech) => (
+                    <span key={tech} className="px-2 py-0.5 bg-dark-700/50 text-gray-400 text-xs rounded">
                       {tech}
-                    </Badge>
+                    </span>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </FadeInUp>
+
+      {/* Project Detail Modal */}
+      <AnimatePresence>
+        {selectedProject && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-dark-950/90 backdrop-blur-sm z-50 flex items-start justify-center p-4 overflow-y-auto"
+            onClick={() => setSelectedProject(null)}
+          >
+            <motion.div
+              layoutId={`project-${selectedProject.id}`}
+              className="glass-card max-w-4xl w-full my-8 overflow-hidden"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Modal Header */}
+              <div className="p-6 md:p-8 border-b border-white/5">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <div className="flex flex-wrap gap-2 mb-2">
+                      <span className={`inline-block px-2 py-1 rounded text-xs font-medium border ${categoryColors[selectedProject.category]}`}>
+                        {selectedProject.category}
+                      </span>
+                      <span className="inline-block px-2 py-1 rounded text-xs font-medium bg-dark-700 text-gray-400 border border-white/5">
+                        {selectedProject.timeline}
+                      </span>
+                      {selectedProject.team && (
+                        <span className="inline-block px-2 py-1 rounded text-xs font-medium bg-dark-700 text-gray-400 border border-white/5">
+                          <Users size={12} className="inline mr-1" />
+                          {selectedProject.team}
+                        </span>
+                      )}
+                    </div>
+                    <h3 className="text-2xl md:text-3xl font-bold text-white">
+                      {selectedProject.title}
+                    </h3>
+                    <p className="text-cyber-cyan mt-1">{selectedProject.tagline}</p>
+                    
+                    {selectedProject.achievement && (
+                      <div className="mt-3 inline-flex items-center gap-2 px-3 py-1.5 bg-yellow-500/10 text-yellow-400 border border-yellow-500/20 rounded-lg text-sm">
+                        🏆 {selectedProject.achievement.title}: {selectedProject.achievement.result}
+                      </div>
+                    )}
+                  </div>
+                  <button
+                    onClick={() => setSelectedProject(null)}
+                    className="p-2 text-gray-400 hover:text-white transition-colors"
+                  >
+                    <X size={24} />
+                  </button>
+                </div>
+
+                {/* Tab Navigation */}
+                <div className="flex gap-2 mt-6">
+                  {(["overview", "architecture", "tech"] as const).map((tab) => (
+                    <button
+                      key={tab}
+                      onClick={() => setActiveTab(tab)}
+                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                        activeTab === tab
+                          ? "bg-cyber-cyan text-dark-950"
+                          : "bg-dark-800 text-gray-400 hover:text-white hover:bg-dark-700"
+                      }`}
+                    >
+                      {tab.charAt(0).toUpperCase() + tab.slice(1)}
+                    </button>
                   ))}
                 </div>
               </div>
 
-              <div className="flex flex-wrap gap-4 pt-4">
-                {selectedProject.liveUrl && (
-                  <Button className="bg-highlight text-navy hover:bg-highlight/90" asChild>
-                    <a href={selectedProject.liveUrl} target="_blank" rel="noopener noreferrer">
-                      <ExternalLink className="mr-2 h-4 w-4" />
+              {/* Modal Content */}
+              <div className="p-6 md:p-8 max-h-[60vh] overflow-y-auto">
+                <AnimatePresence mode="wait">
+                  {activeTab === "overview" && (
+                    <motion.div
+                      key="overview"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      className="space-y-6"
+                    >
+                      {/* Problem & Solution */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                          <h4 className="text-sm font-semibold text-gray-400 uppercase tracking-wide mb-2 flex items-center gap-2">
+                            <Zap size={14} className="text-red-400" />
+                            The Problem
+                          </h4>
+                          <p className="text-gray-300">{selectedProject.problemSolved}</p>
+                        </div>
+                        <div>
+                          <h4 className="text-sm font-semibold text-gray-400 uppercase tracking-wide mb-2 flex items-center gap-2">
+                            <Shield size={14} className="text-green-400" />
+                            The Solution
+                          </h4>
+                          <p className="text-gray-300">{selectedProject.quickSummary}</p>
+                        </div>
+                      </div>
+
+                      {/* Impact Metrics */}
+                      <div>
+                        <h4 className="text-sm font-semibold text-gray-400 uppercase tracking-wide mb-3">
+                          Impact Metrics
+                        </h4>
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+                          {selectedProject.impactMetrics.map((metric) => (
+                            <div key={metric.label} className="bg-dark-800/50 rounded-lg p-3 text-center border border-white/5">
+                              <p className="text-cyber-cyan font-bold text-lg">{metric.value}</p>
+                              <p className="text-gray-400 text-xs">{metric.label}</p>
+                              {metric.description && (
+                                <p className="text-gray-500 text-xs mt-1">{metric.description}</p>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Key Features */}
+                      <div>
+                        <h4 className="text-sm font-semibold text-gray-400 uppercase tracking-wide mb-3">
+                          Key Features
+                        </h4>
+                        <ul className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                          {selectedProject.keyFeatures.map((feature, i) => (
+                            <li key={i} className="flex items-start gap-2 text-gray-300 text-sm">
+                              <span className="text-cyber-cyan mt-0.5">▹</span>
+                              {feature}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+
+                      {/* Security Features (if present) */}
+                      {selectedProject.securityFeatures && (
+                        <div>
+                          <h4 className="text-sm font-semibold text-gray-400 uppercase tracking-wide mb-3 flex items-center gap-2">
+                            <Shield size={14} className="text-green-400" />
+                            Security Features
+                          </h4>
+                          <ul className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                            {selectedProject.securityFeatures.map((feature, i) => (
+                              <li key={i} className="flex items-start gap-2 text-gray-300 text-sm">
+                                <span className="text-green-400 mt-0.5">✓</span>
+                                {feature}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </motion.div>
+                  )}
+
+                  {activeTab === "architecture" && (
+                    <motion.div
+                      key="architecture"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      className="space-y-6"
+                    >
+                      <h4 className="text-sm font-semibold text-gray-400 uppercase tracking-wide mb-3 flex items-center gap-2">
+                        <Layers size={14} className="text-cyber-cyan" />
+                        Core Components
+                      </h4>
+                      <div className="space-y-4">
+                        {selectedProject.coreComponents.map((component, i) => (
+                          <div key={i} className="bg-dark-800/50 rounded-lg p-4 border border-white/5">
+                            <div className="flex items-center gap-2 mb-2">
+                              <Server size={16} className="text-cyber-cyan" />
+                              <h5 className="font-semibold text-white">{component.name}</h5>
+                            </div>
+                            <p className="text-gray-400 text-sm mb-3">{component.description}</p>
+                            {component.techDetails && (
+                              <ul className="space-y-1">
+                                {component.techDetails.map((detail, j) => (
+                                  <li key={j} className="flex items-start gap-2 text-gray-300 text-xs font-mono">
+                                    <span className="text-cyber-cyan mt-0.5">•</span>
+                                    {detail}
+                                  </li>
+                                ))}
+                              </ul>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </motion.div>
+                  )}
+
+                  {activeTab === "tech" && (
+                    <motion.div
+                      key="tech"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      className="space-y-6"
+                    >
+                      <h4 className="text-sm font-semibold text-gray-400 uppercase tracking-wide mb-3 flex items-center gap-2">
+                        <Code2 size={14} className="text-cyber-cyan" />
+                        Technology Stack
+                      </h4>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {selectedProject.techStack.map((category) => (
+                          <div key={category.category} className="bg-dark-800/50 rounded-lg p-4 border border-white/5">
+                            <h5 className="font-medium text-white mb-3">{category.category}</h5>
+                            <div className="flex flex-wrap gap-2">
+                              {category.technologies.map((tech) => (
+                                <span
+                                  key={tech}
+                                  className="px-3 py-1.5 bg-dark-700 text-gray-300 text-sm rounded-lg border border-white/5"
+                                >
+                                  {tech}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+
+              {/* Modal Footer - Links */}
+              <div className="p-6 md:p-8 border-t border-white/5">
+                <div className="flex flex-wrap gap-3">
+                  {selectedProject.liveDemo && (
+                    <a
+                      href={selectedProject.liveDemo}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-cyber-cyan to-cyber-blue text-dark-950 font-semibold rounded-lg hover:shadow-lg hover:shadow-cyber-cyan/25 transition-all"
+                    >
+                      <ExternalLink size={18} />
                       Live Demo
                     </a>
-                  </Button>
-                )}
-                {selectedProject.githubUrl && (
-                  <Button variant="outline" className="border-highlight text-highlight hover:bg-highlight/10" asChild>
-                    <a href={selectedProject.githubUrl} target="_blank" rel="noopener noreferrer">
-                      <Github className="mr-2 h-4 w-4" />
-                      Source Code
+                  )}
+                  {selectedProject.hackathonUrl && (
+                    <a
+                      href={selectedProject.hackathonUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 px-4 py-2 bg-cyber-purple/20 text-cyber-purple border border-cyber-purple/30 rounded-lg hover:bg-cyber-purple/30 transition-colors"
+                    >
+                      <ExternalLink size={18} />
+                      Hackathon Showcase
                     </a>
-                  </Button>
-                )}
+                  )}
+                  <a
+                    href={selectedProject.github}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 px-4 py-2 bg-dark-700 text-white rounded-lg hover:bg-dark-600 transition-colors"
+                  >
+                    <Github size={18} />
+                    View Code
+                  </a>
+                  {selectedProject.altGithub && (
+                    <a
+                      href={selectedProject.altGithub}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 px-4 py-2 bg-dark-700 text-gray-400 rounded-lg hover:bg-dark-600 hover:text-white transition-colors"
+                    >
+                      <Github size={18} />
+                      Related Repo
+                    </a>
+                  )}
+                </div>
               </div>
-            </div>
-          </DialogContent>
+            </motion.div>
+          </motion.div>
         )}
-      </Dialog>
+      </AnimatePresence>
     </section>
   );
 };

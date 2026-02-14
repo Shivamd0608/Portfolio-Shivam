@@ -1,100 +1,155 @@
-
-import { useState, useEffect } from "react";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
+import { motion } from "framer-motion";
+import { Code2, Blocks, Users, Shield, Zap, Globe } from "lucide-react";
+import { FadeInUp, StaggerContainer, StaggerItem } from "./motion";
+import { education, stats } from "@/data";
 
 const AboutSection = () => {
-  const [isVisible, setIsVisible] = useState(false);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver((entries) => {
-      if (entries[0].isIntersecting) {
-        setIsVisible(true);
-        observer.unobserve(entries[0].target);
-      }
-    }, { threshold: 0.1 });
-
-    const element = document.getElementById("about");
-    if (element) observer.observe(element);
-
-    return () => {
-      if (element) observer.unobserve(element);
-    };
-  }, []);
-
-  const achievements = [
-
-  " Lead Web Developer and Founding Member",
-   "Mentor at Cyberlabs (Blockchain division)",
-    "Mentor at RoboISM (robotics club)",
-    "Member of Mic Drop (public speaking club)",
-    "PR team organizer for Srijan (East Asia's largest socio-cultural fest)"
+  const highlights = [
+    {
+      icon: <Blocks className="w-5 h-5" />,
+      title: "DeFi Expertise",
+      description: "Aave V3 integration, liquidation prevention, multi-chain protocols",
+    },
+    {
+      icon: <Shield className="w-5 h-5" />,
+      title: "Smart Contract Security",
+      description: "UUPS patterns, ReentrancyGuard, atomic execution, zero-residual invariants",
+    },
+    {
+      icon: <Globe className="w-5 h-5" />,
+      title: "Multi-Chain",
+      description: "Ethereum, Optimism, Arbitrum, Base, Mantle L2, Internet Computer",
+    },
+    {
+      icon: <Users className="w-5 h-5" />,
+      title: "Technical Mentor",
+      description: "30+ students mentored in Solidity, DeFi protocols, and Web3 development",
+    },
   ];
 
   return (
     <section id="about" className="section-container">
-      <h2 className={`section-title ${isVisible ? 'animate-fade-in-up' : 'opacity-0'}`}>
-        <span className="section-title-number">01.</span> About Me
-      </h2>
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-        {/* Text Content - 2/3 width on desktop */}
-        <div className={`lg:col-span-2 ${isVisible ? 'animate-fade-in-up' : 'opacity-0'}`} style={{ animationDelay: '200ms' }}>
-          <div className="space-y-6 text-slate">
-            <p>
-              Hello! I'm Shivam, a full stack web developer with a passion for building digital
-              experiences that are both functional and beautiful. My journey in web development 
-              started during my time at IIT ISM Dhanbad, where I pursued a B.Tech in Electrical Engineering.
+      <FadeInUp>
+        <p className="text-cyber-cyan font-mono text-sm mb-2">01. Who I Am</p>
+        <h2 className="section-title">About Me</h2>
+      </FadeInUp>
+
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-12 mt-8">
+        {/* Main content */}
+        <div className="lg:col-span-3 space-y-6">
+          <FadeInUp delay={0.1}>
+            <p className="text-gray-300 text-lg leading-relaxed">
+              I'm a <span className="text-white font-medium">blockchain developer</span> pursuing 
+              B.Tech in Electrical Engineering at IIT (ISM) Dhanbad (Class of 2027). I architect 
+              DeFi protocols, multi-chain infrastructure, and Web3 tooling.
             </p>
-            <p>
-              Throughout my academic and professional journey, I've had the opportunity to work
-              on various projects that have helped me develop a strong foundation in both frontend
-              and backend technologies. My focus is on creating responsive, user-friendly applications
-              that solve real-world problems.
+          </FadeInUp>
+
+          <FadeInUp delay={0.2}>
+            <p className="text-gray-400 leading-relaxed">
+              My flagship project <span className="text-cyber-cyan">Rescue.ETH</span> is an autonomous 
+              keeper system that prevents DeFi liquidations across 4 blockchain networks. I also built 
+              <span className="text-cyber-cyan"> GreenAiDEX</span> (612 community votes at Mantle Global 
+              Hackathon 2025) and led the team that created <span className="text-cyber-cyan">ICPad</span>, 
+              securing National Rank #2 at WCHL25 among 1150+ teams.
             </p>
-            <p>
-              When I'm not coding, you can find me mentoring junior developers, participating in
-              robotics club activities, or honing my public speaking skills at Mic Drop club.
+          </FadeInUp>
+
+          <FadeInUp delay={0.3}>
+            <p className="text-gray-400 leading-relaxed">
+              Currently mentoring 30+ students on Ethereum development, DeFi protocols, and smart 
+              contract security at Cyberlabs blockchain division. I focus on technical depth over 
+              project quantity—building production-grade systems with real impact.
             </p>
-            <div>
-              <h3 className="text-xl font-bold mb-4 text-slate-light">Key Achievements:</h3>
-              <ul className="space-y-2">
-                {achievements.map((achievement, index) => (
-                  <li key={index} className="flex items-start">
-                    <span className="text-highlight mr-2">▹</span>
-                    <span>{achievement}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
+          </FadeInUp>
+
+          {/* Highlights grid */}
+          <StaggerContainer className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4">
+            {highlights.map((item) => (
+              <StaggerItem key={item.title}>
+                <div className="glass-card p-4 glow-border">
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="text-cyber-cyan">{item.icon}</div>
+                    <h4 className="font-semibold text-white">{item.title}</h4>
+                  </div>
+                  <p className="text-gray-400 text-sm">{item.description}</p>
+                </div>
+              </StaggerItem>
+            ))}
+          </StaggerContainer>
         </div>
 
-        {/* Education Card - 1/3 width on desktop */}
-        <div className={`${isVisible ? 'animate-fade-in-up' : 'opacity-0'}`} style={{ animationDelay: '400ms' }}>
-          <Card className="bg-navy-light border border-highlight/20">
-            <CardContent className="p-6">
-              <h3 className="text-xl font-bold mb-4 text-slate-light text-center">Education</h3>
-              <div className="space-y-6">
-                <div className="relative pl-6 pb-6 border-l border-highlight">
-                  <div className="absolute w-3 h-3 bg-highlight rounded-full -left-[6.5px] top-0"></div>
-                  <div className="mb-2">
-                    <Badge className="bg-highlight text-navy">2016 - 2020</Badge>
-                  </div>
-                  <h4 className="font-semibold text-lg">B.Tech in Electrical Engineering</h4>
-                  <p className="text-slate">IIT ISM Dhanbad</p>
+        {/* Education timeline */}
+        <FadeInUp delay={0.4} className="lg:col-span-2">
+          <div className="glass-card p-6 glow-border">
+            <h3 className="text-lg font-semibold text-white mb-6">Education</h3>
+            <div className="space-y-6">
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.5 }}
+                className="relative pl-6 border-l-2 border-cyber-cyan/30"
+              >
+                <div className="absolute w-3 h-3 bg-cyber-cyan rounded-full -left-[7px] top-1" />
+                <span className="text-cyber-cyan font-mono text-xs">{education.duration}</span>
+                <h4 className="font-semibold text-white mt-1">{education.degree} in {education.major}</h4>
+                <p className="text-gray-400 text-sm">{education.shortName}</p>
+                <p className="text-gray-500 text-xs mt-1">{education.location}</p>
+              </motion.div>
+              
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.6 }}
+                className="relative pl-6 border-l-2 border-yellow-500/30"
+              >
+                <div className="absolute w-3 h-3 bg-yellow-500 rounded-full -left-[7px] top-1" />
+                <span className="text-yellow-400 font-mono text-xs">January 2025</span>
+                <h4 className="font-semibold text-white mt-1">National Rank #2 — WCHL25</h4>
+                <p className="text-gray-400 text-sm">Among {stats.teamsCompetedAgainst} teams nationally</p>
+              </motion.div>
+              
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.7 }}
+                className="relative pl-6 border-l-2 border-cyber-purple/30"
+              >
+                <div className="absolute w-3 h-3 bg-cyber-purple rounded-full -left-[7px] top-1" />
+                <span className="text-cyber-purple font-mono text-xs">January 2026</span>
+                <h4 className="font-semibold text-white mt-1">{stats.communityVotes} Community Votes</h4>
+                <p className="text-gray-400 text-sm">Mantle Global Hackathon 2025</p>
+              </motion.div>
+            </div>
+
+            {/* Quick stats */}
+            <div className="mt-8 pt-6 border-t border-white/5">
+              <div className="grid grid-cols-2 gap-4 text-center">
+                <div>
+                  <p className="text-2xl font-bold gradient-text">{stats.teamsCompetedAgainst}</p>
+                  <p className="text-gray-400 text-xs">Teams Competed Against</p>
                 </div>
-                <div className="relative pl-6">
-                  <div className="absolute w-3 h-3 bg-highlight rounded-full -left-[6.5px] top-0"></div>
-                  <div className="mb-2">
-                    <Badge className="bg-highlight text-navy">2014 - 2016</Badge>
-                  </div>
-                  <h4 className="font-semibold text-lg">Higher Secondary Education</h4>
-                  <p className="text-slate">Excellence School</p>
+                <div>
+                  <p className="text-2xl font-bold gradient-text">#{stats.nationalRank}</p>
+                  <p className="text-gray-400 text-xs">National Ranking</p>
                 </div>
               </div>
-            </CardContent>
-          </Card>
-        </div>
+              <div className="grid grid-cols-2 gap-4 text-center mt-4">
+                <div>
+                  <p className="text-2xl font-bold gradient-text">{stats.communityVotes}</p>
+                  <p className="text-gray-400 text-xs">Community Votes</p>
+                </div>
+                <div>
+                  <p className="text-2xl font-bold gradient-text">{stats.studentsMentored}</p>
+                  <p className="text-gray-400 text-xs">Students Mentored</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </FadeInUp>
       </div>
     </section>
   );

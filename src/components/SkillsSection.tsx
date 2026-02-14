@@ -1,215 +1,159 @@
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { FadeInUp, StaggerContainer, StaggerItem } from "./motion";
+import { skillCategories, projects } from "@/data";
+import type { SkillLevel } from "@/data/personal";
 
-import { useState, useEffect } from "react";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+const levelColors: Record<SkillLevel, string> = {
+  expert: "bg-cyber-cyan/20 text-cyber-cyan border-cyber-cyan/40",
+  advanced: "bg-cyber-blue/20 text-cyber-blue border-cyber-blue/40",
+  intermediate: "bg-cyber-purple/20 text-cyber-purple border-cyber-purple/40",
+  learning: "bg-yellow-500/20 text-yellow-400 border-yellow-500/40",
+};
 
-type Skill = {
-  name: string;
-  proficiency: number;
-  category: string;
-  description: string;
+const levelLabels: Record<SkillLevel, string> = {
+  expert: "Expert",
+  advanced: "Advanced",
+  intermediate: "Proficient",
+  learning: "Learning",
 };
 
 const SkillsSection = () => {
-  const [isVisible, setIsVisible] = useState(false);
-  const [filter, setFilter] = useState<string>("All");
+  const [activeCategory, setActiveCategory] = useState<string | null>(null);
+  const [hoveredSkill, setHoveredSkill] = useState<string | null>(null);
 
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting) {
-          setIsVisible(true);
-          observer.unobserve(entries[0].target);
-        }
-      },
-      { threshold: 0.1 }
-    );
-
-    const element = document.getElementById("skills");
-    if (element) observer.observe(element);
-
-    return () => {
-      if (element) observer.unobserve(element);
-    };
-  }, []);
-  
-const skills: Skill[] = [
-  {
-    name: "JavaScript",
-    proficiency: 90, 
-    category: "Languages",
-    description: "Core programming language for web development."
-  },
-  {
-    name: "C",
-    proficiency: 85,
-    category: "Languages",
-    description: "A foundational programming language for system programming."
-  },
-  {
-    name: "C++",
-    proficiency: 85,
-    category: "Languages",
-    description: "A powerful object-oriented programming language."
-  },
-  {
-    name: "Solidity",
-    proficiency: 75,
-    category: "Languages",
-    description: "Object-oriented programming language for writing smart contracts."
-  },
-  {
-    name: "Rust",
-    proficiency: 65, // Rust is a general-purpose programming language emphasizing performance and reliability. It is noted for its memory safety without a garbage collector.
-    category: "Languages",
-    description: "A systems programming language focused on safety, performance, and concurrency."
-  },
-  {
-    name: "Node.js",
-    proficiency: 85,
-    category: "Technologies",
-    description: "Server-side JavaScript runtime for building scalable network applications."
-  },
-  {
-    name: "MySQL",
-    proficiency: 75,
-    category: "Databases",
-    description: "An open-source relational database management system."
-  },
-  {
-    name: "MongoDB",
-    proficiency: 80,
-    category: "Databases",
-    description: "A NoSQL database for modern applications with flexible schema design."
-  },
-  {
-    name: "Express.js",
-    proficiency: 85,
-    category: "Technologies",
-    description: "Fast, unopinionated, minimalist web framework for Node.js."
-  },
-  {
-    name: "React.js",
-    proficiency: 90,
-    category: "Technologies",
-    description: "Building interactive UIs with React and its ecosystem."
-  },
-  {
-    name: "Tailwind CSS",
-    proficiency: 85,
-    category: "Technologies",
-    description: "A utility-first CSS framework for rapid UI development."
-  },
-  {
-    name: "Web3.js",
-    proficiency: 75,
-    category: "Technologies",
-    description: "A library for interacting with the Ethereum blockchain."
-  },
-  {
-    name: "Ethers.js",
-    proficiency: 75,
-    category: "Technologies",
-    description: "A complete and compact library for interacting with the Ethereum blockchain."
-  },
-  {
-    name: "Foundry",
-    proficiency: 70,
-    category: "Technologies",
-    description: "A blazing fast, portable, and modular toolkit for Ethereum application development."
-  },
-  {
-    name: "Git",
-    proficiency: 90,
-    category: "Developer Tools",
-    description: "Distributed version control system for tracking changes in source code."
-  },
-  {
-    name: "GitHub",
-    proficiency: 90,
-    category: "Developer Tools",
-    description: "A platform for hosting and collaborating on Git repositories."
-  },
-  {
-    name: "Postman",
-    proficiency: 85,
-    category: "Developer Tools",
-    description: "An API platform for building and using APIs."
-  },
-  {
-    name: "VS Code",
-    proficiency: 95,
-    category: "Developer Tools",
-    description: "A powerful and popular code editor for web and software development."
-  }
-];
-
-  const categories = ["All", ...new Set(skills.map((skill) => skill.category))];
-  const filteredSkills = filter === "All" ? skills : skills.filter((skill) => skill.category === filter);
+  // Find which projects use the hovered skill
+  const getProjectsForSkill = (skillName: string) => {
+    const skillInfo = skillCategories
+      .flatMap(cat => cat.skills)
+      .find(s => s.name === skillName);
+    
+    if (!skillInfo?.usedIn?.length) return [];
+    
+    return projects.filter(p => skillInfo.usedIn?.includes(p.id));
+  };
 
   return (
     <section id="skills" className="section-container">
-      <h2 className={`section-title ${isVisible ? "animate-fade-in-up" : "opacity-0"}`}>
-        <span className="section-title-number">02.</span> Skills & Expertise
-      </h2>
+      <FadeInUp>
+        <p className="text-cyber-cyan font-mono text-sm mb-2">02. What I Work With</p>
+        <h2 className="section-title">Skills & Technologies</h2>
+        <p className="section-subtitle">
+          Technologies I use to build production-grade blockchain systems. Hover on any skill to see which projects use it.
+        </p>
+      </FadeInUp>
 
-      {/* Category Filters */}
-      <div className={`mb-10 flex flex-wrap gap-2 ${isVisible ? "animate-fade-in-up" : "opacity-0"}`} style={{ animationDelay: "200ms" }}>
-        {categories.map((category) => (
-          <Badge
-            key={category}
-            className={`cursor-pointer text-sm py-2 px-4 ${
-              filter === category
-                ? "bg-highlight text-navy"
-                : "bg-navy-light hover:bg-navy-light/80"
-            }`}
-            onClick={() => setFilter(category)}
-          >
-            {category}
-          </Badge>
-        ))}
-      </div>
+      {/* Legend */}
+      <FadeInUp delay={0.1}>
+        <div className="flex flex-wrap gap-4 mb-8">
+          {(Object.keys(levelColors) as SkillLevel[]).map((level) => (
+            <div key={level} className="flex items-center gap-2">
+              <span className={`px-2 py-0.5 rounded text-xs font-medium border ${levelColors[level]}`}>
+                {levelLabels[level]}
+              </span>
+            </div>
+          ))}
+        </div>
+      </FadeInUp>
 
       {/* Skills Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredSkills.map((skill, index) => (
-          <TooltipProvider key={skill.name}>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Card
-                  className={`bg-navy-light border border-highlight/20 overflow-hidden hover:border-highlight/50 transition-all duration-300 ${
-                    isVisible ? "animate-fade-in-up" : "opacity-0"
-                  } card-hover`}
-                  style={{ animationDelay: `${300 + index * 100}ms` }}
-                >
-                  <CardContent className="p-6">
-                    <div className="flex justify-between items-center mb-4">
-                      <h3 className="text-xl font-semibold text-slate-light">{skill.name}</h3>
-                      <Badge className="bg-highlight/20 text-highlight">
-                        {skill.category}
-                      </Badge>
-                    </div>
-                    <div className="w-full animated-skill-bar mb-2">
-                      <div
-                        className="h-full bg-highlight"
-                        style={{ width: `${skill.proficiency}%`, transition: "width 1s ease-in-out" }}
-                      ></div>
-                    </div>
-                    <div className="flex justify-between text-xs text-slate">
-                      <span>Proficiency</span>
-                      <span>{skill.proficiency}%</span>
-                    </div>
-                  </CardContent>
-                </Card>
-              </TooltipTrigger>
-              <TooltipContent className="bg-navy-light border-highlight/30 p-3 max-w-xs">
-                <p>{skill.description}</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+      <StaggerContainer className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {skillCategories.map((category) => (
+          <StaggerItem key={category.id}>
+            <motion.div
+              whileHover={{ y: -4 }}
+              className={`glass-card p-6 glow-border h-full cursor-pointer transition-all ${
+                activeCategory === category.id ? "ring-1 ring-cyber-cyan/50" : ""
+              }`}
+              onClick={() => setActiveCategory(activeCategory === category.id ? null : category.id)}
+            >
+              <div className="flex items-center gap-3 mb-2">
+                <span className="text-2xl">{category.icon}</span>
+                <h3 className="text-lg font-semibold text-white">{category.title}</h3>
+              </div>
+              <p className="text-gray-500 text-sm mb-4">{category.description}</p>
+              
+              <div className="flex flex-wrap gap-2">
+                {category.skills.map((skill) => (
+                  <motion.span
+                    key={skill.name}
+                    whileHover={{ scale: 1.05 }}
+                    onHoverStart={() => setHoveredSkill(skill.name)}
+                    onHoverEnd={() => setHoveredSkill(null)}
+                    className={`relative px-3 py-1.5 rounded-lg text-sm font-medium border transition-all cursor-default ${levelColors[skill.level]} ${
+                      hoveredSkill === skill.name ? "ring-2 ring-white/20" : ""
+                    }`}
+                  >
+                    {skill.name}
+                    {skill.usedIn && skill.usedIn.length > 0 && (
+                      <span className="absolute -top-1 -right-1 w-2 h-2 bg-cyber-cyan rounded-full" />
+                    )}
+                  </motion.span>
+                ))}
+              </div>
+            </motion.div>
+          </StaggerItem>
         ))}
-      </div>
+      </StaggerContainer>
+
+      {/* Project Connection Panel */}
+      <AnimatePresence>
+        {hoveredSkill && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+            className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 glass-card p-4 glow-border max-w-md"
+          >
+            <p className="text-sm text-gray-400 mb-2">
+              <span className="text-cyber-cyan font-medium">{hoveredSkill}</span> used in:
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {getProjectsForSkill(hoveredSkill).length > 0 ? (
+                getProjectsForSkill(hoveredSkill).map(project => (
+                  <span
+                    key={project.id}
+                    className="px-2 py-1 bg-dark-700/50 text-gray-300 text-xs rounded border border-white/5"
+                  >
+                    {project.title}
+                  </span>
+                ))
+              ) : (
+                <span className="text-gray-500 text-xs">Various personal projects</span>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Tech Stack Summary */}
+      <FadeInUp delay={0.3}>
+        <div className="mt-12 glass-card p-6 glow-border">
+          <h3 className="text-lg font-semibold text-white mb-4">Primary Tech Stack</h3>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="text-center p-4 rounded-lg bg-dark-800/50">
+              <p className="text-2xl mb-2">⛓️</p>
+              <p className="text-sm font-medium text-white">Solidity</p>
+              <p className="text-xs text-gray-500">Smart Contracts</p>
+            </div>
+            <div className="text-center p-4 rounded-lg bg-dark-800/50">
+              <p className="text-2xl mb-2">🦀</p>
+              <p className="text-sm font-medium text-white">Rust</p>
+              <p className="text-xs text-gray-500">ICP Canisters</p>
+            </div>
+            <div className="text-center p-4 rounded-lg bg-dark-800/50">
+              <p className="text-2xl mb-2">⚛️</p>
+              <p className="text-sm font-medium text-white">React / Next.js</p>
+              <p className="text-xs text-gray-500">Frontend</p>
+            </div>
+            <div className="text-center p-4 rounded-lg bg-dark-800/50">
+              <p className="text-2xl mb-2">🔷</p>
+              <p className="text-sm font-medium text-white">TypeScript</p>
+              <p className="text-xs text-gray-500">Type Safety</p>
+            </div>
+          </div>
+        </div>
+      </FadeInUp>
     </section>
   );
 };

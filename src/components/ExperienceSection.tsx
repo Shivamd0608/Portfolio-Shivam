@@ -1,213 +1,121 @@
+import { motion } from "framer-motion";
+import { FadeInUp } from "./motion";
+import { Briefcase, Users, Calendar, GraduationCap, Mic } from "lucide-react";
+import { experiences } from "@/data";
 
-import { useState, useEffect } from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+const typeIcons = {
+  work: <Briefcase size={18} />,
+  mentorship: <GraduationCap size={18} />,
+  community: <Mic size={18} />,
+};
 
-type Experience = {
-  id: number;
-  title: string;
-  company: string;
-  location: string;
-  period: string;
-  description: string[];
-  skills: string[];
-  type: "professional" | "leadership";
-  logo: string;
+const typeColors = {
+  work: "bg-cyber-cyan/10 text-cyber-cyan",
+  mentorship: "bg-yellow-500/10 text-yellow-400",
+  community: "bg-cyber-purple/10 text-cyber-purple",
 };
 
 const ExperienceSection = () => {
-  const [isVisible, setIsVisible] = useState(false);
-  const [activeTab, setActiveTab] = useState<"all" | "professional" | "leadership">("all");
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting) {
-          setIsVisible(true);
-          observer.unobserve(entries[0].target);
-        }
-      },
-      { threshold: 0.1 }
-    );
-
-    const element = document.getElementById("experience");
-    if (element) observer.observe(element);
-
-    return () => {
-      if (element) observer.unobserve(element);
-    };
-  }, []);
-
-  
-const experiences: Experience[] = [
-  {
-    id: 1,
-    title: "Lead Web Developer and Founding Member",
-    company: "Cozync",
-    location: "Remote & IIT ISM Dhanbad",
-    period: "June 2020 - Present",
-    description: [
-      "Led the development of the company's main web application using React and Node.js.",
-      "Co-founded and established the company, coordinating with cross-functional teams to define and implement new features.",
-      "Mentored junior developers and established coding standards.",
-      "Implemented responsive UI designs and integrated payment gateways and third-party APIs.",
-      "Built and maintained the organization's website and technical infrastructure."
-    ],
-    skills: ["React.js", "Node.js", "Express.js", "MongoDB", "CI/CD", "Leadership", "Mentorship"],
-    type: "professional",
-    logo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQNA_KtQ9YzfWNyB_FXnVgIOm_TzcLAf2B-ow&s"
-  },
-  {
-    id: 2,
-    title: "Mentor",
-    company: "Cyberlabs (Blockchain Division)",
-    location: "IIT(ISM) Dhanbad",
-    period: "August 2023 - Present",
-    description: [
-      "Guiding students in Ethereum smart contracts, dApp development, and core blockchain concepts."
-    ],
-    skills: ["Solidity", "dApp Development", "Blockchain", "Mentorship"],
-    type: "leadership",
-    logo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQBK8ekPv5JhmB-PTyuxKxylsPJAdNB0gibkg&s"
-  },
-  {
-    id: 3,
-    title: "Mentor",
-    company: "RoboISM",
-    location: "IIT ISM Dhanbad",
-    period: "September 2023 - Present",
-    description: [
-      "Guiding students in robotics, design, and modeling."
-    ],
-    skills: ["Robotics", "Design", "Modeling", "Mentorship"],
-    type: "leadership",
-    logo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRteelL88dgmkYlP-MTdiaDfEP4cMzDlRIVLw&s"
-  },
-  {
-    id: 4,
-    title: "Mentor",
-    company: "Mic.drop",
-    location: "IIT ISM Dhanbad",
-    period: "September 2023 - Present",
-    description: [
-      "Supporting students in developing public speaking and communication skills."
-    ],
-    skills: ["Public Speaking", "Communication", "Mentorship"],
-    type: "leadership",
-    logo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ9I-hv52q6Z-sFRKsAwL4embtsnN9-5FCqZw&s"
-  },
-  {
-    id: 5,
-    title: "Organiser",
-    company: "PR Team Srijan 25",
-    location: "IIT (ISM) Dhanbad",
-    period: "January 2025",
-    description: [
-      "Organised events in PR Team Srijan 25, the annual technical fest of IIT (ISM) Dhanbad; RoboRumble, RobolSM, IIT Dhanbad; Robowars, Concetto'24."
-    ],
-    skills: ["Event Management", "Public Relations", "Teamwork"],
-    type: "leadership",
-    logo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRziLA9lQN1M02eDRdyrjyeqMMKXrSJRHpg6g&s"
-  }
-];
-
-  const filteredExperiences = activeTab === "all" 
-    ? experiences 
-    : experiences.filter(exp => exp.type === activeTab);
-
   return (
     <section id="experience" className="section-container">
-      <h2 className={`section-title ${isVisible ? "animate-fade-in-up" : "opacity-0"}`}>
-        <span className="section-title-number">04.</span> Experience
-      </h2>
+      <FadeInUp>
+        <p className="text-cyber-cyan font-mono text-sm mb-2">04. Where I've Worked</p>
+        <h2 className="section-title">Experience & Leadership</h2>
+        <p className="section-subtitle">
+          Professional work and community contributions that shaped my journey in blockchain development.
+        </p>
+      </FadeInUp>
 
-      {/* Experience Type Tabs */}
-      <div className={`flex border-b border-highlight/20 mb-10 ${isVisible ? "animate-fade-in-up" : "opacity-0"}`} style={{ animationDelay: "200ms" }}>
-        <button
-          onClick={() => setActiveTab("all")}
-          className={`px-4 py-2 font-medium text-sm transition-colors duration-300 ${
-            activeTab === "all"
-              ? "border-b-2 border-highlight text-highlight"
-              : "text-slate hover:text-slate-light"
-          }`}
-        >
-          All
-        </button>
-        <button
-          onClick={() => setActiveTab("professional")}
-          className={`px-4 py-2 font-medium text-sm transition-colors duration-300 ${
-            activeTab === "professional"
-              ? "border-b-2 border-highlight text-highlight"
-              : "text-slate hover:text-slate-light"
-          }`}
-        >
-          Professional
-        </button>
-        <button
-          onClick={() => setActiveTab("leadership")}
-          className={`px-4 py-2 font-medium text-sm transition-colors duration-300 ${
-            activeTab === "leadership"
-              ? "border-b-2 border-highlight text-highlight"
-              : "text-slate hover:text-slate-light"
-          }`}
-        >
-          Leadership
-        </button>
-      </div>
+      {/* Timeline */}
+      <div className="relative mt-12">
+        {/* Vertical line */}
+        <div className="absolute left-0 md:left-1/2 top-0 bottom-0 w-px bg-gradient-to-b from-cyber-cyan via-cyber-blue to-transparent" />
 
-      {/* Experience Timeline */}
-      <div className="space-y-8">
-        {filteredExperiences.map((exp, index) => (
-          <Card
+        {experiences.map((exp, index) => (
+          <motion.div
             key={exp.id}
-            className={`bg-navy-light border border-highlight/20 overflow-hidden ${
-              isVisible ? "animate-fade-in-up" : "opacity-0"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ delay: index * 0.1, duration: 0.5 }}
+            className={`relative flex flex-col md:flex-row gap-8 mb-12 ${
+              index % 2 === 0 ? "md:flex-row" : "md:flex-row-reverse"
             }`}
-            style={{ animationDelay: `${300 + index * 150}ms` }}
           >
-            <CardContent className="p-0">
-              <div className="flex flex-col md:flex-row">
-                <div className="md:w-1/4 bg-navy-dark p-6 flex justify-center items-center">
-                  <img
-                    src={exp.logo}
-                    alt={exp.company}
-                    className="w-20 h-20 object-cover rounded-full"
-                  />
-                </div>
-                <div className="md:w-3/4 p-6">
-                  <div className="flex flex-col md:flex-row md:justify-between md:items-start mb-3">
-                    <div>
-                      <h3 className="text-xl font-semibold text-slate-light">
-                        {exp.title}
-                      </h3>
-                      <p className="text-highlight">{exp.company}</p>
-                    </div>
-                    <div className="mt-2 md:mt-0 md:text-right">
-                      <Badge className="bg-highlight/20 text-highlight">
-                        {exp.period}
-                      </Badge>
-                      <p className="text-slate text-sm mt-1">{exp.location}</p>
-                    </div>
+            {/* Timeline dot */}
+            <div className="absolute left-0 md:left-1/2 w-3 h-3 -translate-x-1/2 mt-2">
+              <div className="w-full h-full bg-cyber-cyan rounded-full" />
+              <div className="absolute inset-0 bg-cyber-cyan rounded-full animate-ping opacity-20" />
+            </div>
+
+            {/* Content */}
+            <div
+              className={`flex-1 ml-8 md:ml-0 ${
+                index % 2 === 0 ? "md:pr-12 md:text-right" : "md:pl-12"
+              }`}
+            >
+              <motion.div
+                whileHover={{ y: -2 }}
+                className="glass-card p-6 glow-border inline-block text-left w-full md:max-w-md"
+              >
+                {/* Header */}
+                <div className="flex items-start gap-3 mb-3">
+                  <div className={`p-2 rounded-lg ${typeColors[exp.type]}`}>
+                    {typeIcons[exp.type]}
                   </div>
-                  <ul className="space-y-2 mb-4">
-                    {exp.description.map((item, i) => (
-                      <li key={i} className="flex items-start">
-                        <span className="text-highlight mr-2">▹</span>
-                        <span className="text-slate">{item}</span>
-                      </li>
-                    ))}
-                  </ul>
-                  <div className="flex flex-wrap gap-2 mt-4">
-                    {exp.skills.map((skill) => (
-                      <Badge key={skill} variant="outline" className="border-highlight/30 text-slate-light">
-                        {skill}
-                      </Badge>
-                    ))}
+                  <div className="flex-1">
+                    <h3 className="font-bold text-white">{exp.title}</h3>
+                    <p className="text-gray-400 text-sm">{exp.organization}</p>
+                    {exp.location && (
+                      <p className="text-gray-500 text-xs">{exp.location}</p>
+                    )}
                   </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
+
+                {/* Period */}
+                <div className="flex items-center gap-2 text-gray-500 text-xs mb-4">
+                  <Calendar size={12} />
+                  {exp.period}
+                </div>
+
+                {/* Description */}
+                <ul className="space-y-2 mb-4">
+                  {exp.description.map((item, i) => (
+                    <li
+                      key={i}
+                      className="flex items-start gap-2 text-gray-400 text-sm"
+                    >
+                      <span className="text-cyber-cyan mt-0.5">▹</span>
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+
+                {/* Outcome (if present) */}
+                {exp.outcome && (
+                  <div className="mb-4 p-3 bg-yellow-500/5 border border-yellow-500/20 rounded-lg">
+                    <p className="text-yellow-400 text-xs font-medium">Outcome</p>
+                    <p className="text-gray-300 text-sm mt-1">{exp.outcome}</p>
+                  </div>
+                )}
+
+                {/* Skills */}
+                <div className="flex flex-wrap gap-2">
+                  {exp.skills.map((skill) => (
+                    <span
+                      key={skill}
+                      className="px-2 py-1 bg-dark-700/50 text-gray-400 text-xs rounded"
+                    >
+                      {skill}
+                    </span>
+                  ))}
+                </div>
+              </motion.div>
+            </div>
+
+            {/* Spacer for alternating layout */}
+            <div className="hidden md:block flex-1" />
+          </motion.div>
         ))}
       </div>
     </section>
